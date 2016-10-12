@@ -26,7 +26,7 @@ class BFsearchTest < Minitest::Unit::TestCase
     heuristic = ->(node) { 1.0 }
     neighbors = ->(node) { node[:next] }
 
-    path = BFsearch.new.find_path(tree, tree[:next][0][:next][0],
+    path = BFsearch.find_path(tree, tree[:next][0][:next][0],
                               distance, neighbors, heuristic)
     assert_equal 3, path.length
     assert_equal :goal, path[-1][:name]
@@ -75,7 +75,7 @@ class BFsearchTest < Minitest::Unit::TestCase
     heuristic = ->(node) { node[:h] }
     neighbors = ->(node) { node[:n].keys.map { |k| tree[k] } }
 
-    path = BFsearch.new.find_path(tree[:sb], tree[:wu],
+    path = BFsearch.find_path(tree[:sb], tree[:wu],
                               distance, neighbors, heuristic)
     assert_equal 4, path.length
     assert_equal :sb, path[0][:i]

@@ -21,8 +21,8 @@
 # starting node to a destination node. It will always find a path if one
 # exists.
 #
-# The typical usage is to call BFsearch#find_path.
-class BFsearch
+# The typical usage is to call BFsearch.find_path.
+module BFsearch
 
   ##
   # Finds a way from +root_node+ to +destination_node+ and returns the path
@@ -57,8 +57,8 @@ class BFsearch
   # the triangle inequality.
   #
   #   heuristic_function(node)  # => Float
-  def find_path(root_node, destination, distance_function, neighbors_function,
-           heuristic_function)
+  def self.find_path(root_node, destination, distance_function, neighbors_function,
+        heuristic_function)
     root_entry = {
       node: root_node,
       parent: nil,
@@ -70,7 +70,9 @@ class BFsearch
     until open.empty?
       catch :restart do
         current = open.shift
-        return path(root_node, current) if current[:node] == destination
+        if current[:node] == destination
+          return construct_path(root_node, current) 
+        end
         closed.push current
 
         neighbors_function.call(current[:node]).each do |node|
@@ -104,7 +106,7 @@ class BFsearch
   ##
   # Constructs and returns an array that contains the best path from the
   # root_node to the destination object.
-  def path(root_node, destination)
+  def self.construct_path(root_node, destination)
     nodes = [destination[:node]]
 
     while destination[:node] != root_node do
@@ -118,7 +120,7 @@ class BFsearch
   ##
   # Retruns the accumulated distance between two nodes along the currently
   # recorded path
-  def distance(start, destination, distance_function)
+  def self.distance(start, destination, distance_function)
     current = start
     distance = 0.0
 
@@ -129,4 +131,6 @@ class BFsearch
 
     distance
   end
+
+  private_class_method :distance, :construct_path
 end
