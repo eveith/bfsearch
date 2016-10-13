@@ -75,7 +75,7 @@ module BFsearch
         neighbors_function.call(current.node).each do |node|
           open_entry = open.find {|i| i.node == node }
           closed_entry = closed.find {|i| i.node == node }
-          entry = open_entry || closed_entry || Entry.new(node, current, 0.0)
+          entry = open_entry || closed_entry || Entry.new(node, current, nil)
           goal_distance = heuristic_function.call node
           start_distance = distance entry, root_entry, distance_function
           entry.distance ||= start_distance
