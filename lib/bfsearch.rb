@@ -76,11 +76,22 @@ module BFsearch
           open_entry = open.find {|i| i.node == node }
           closed_entry = closed.find {|i| i.node == node }
           entry = open_entry || closed_entry || Entry.new(node, current, nil)
+
           goal_distance = heuristic_function.call node
           start_distance = distance entry, root_entry, distance_function
           entry.distance ||= start_distance
 
-          unless open_entry || closed_entry
+          # Greedy BFS:
+
+          heuristic_neighbor = heuristic_function.call node
+          heuristic_current = heuristic_function.call current.node
+          if heuristic_neighbor < heuristic_current
+            open.unshift current
+            open.unshift entry
+            throw :restart
+          end
+
+          if !(open_entry || closed_entry)
             open.push entry
           else
             if start_distance < entry.distance
