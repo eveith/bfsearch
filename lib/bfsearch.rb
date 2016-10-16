@@ -58,8 +58,8 @@ module BFsearch
   # the triangle inequality.
   #
   #   heuristic_function(node)  # => Float
-  def self.find_path(root_node, destination, distance_function, neighbors_function,
-        heuristic_function)
+  def self.find_path(root_node, destination,
+      distance_function, neighbors_function, heuristic_function)
     root_entry = Entry.new(root_node, nil, 0.0)
     open = [root_entry]
     closed = []
@@ -67,19 +67,17 @@ module BFsearch
     until open.empty?
       catch :restart do
         current = open.shift
-        if current.node == destination
-          return construct_path(root_node, current) 
-        end
+        return construct_path(root_node, current) if current.node == destination
         closed.push current
 
         neighbors_function.call(current.node).each do |node|
-          open_entry = open.find {|i| i.node == node }
-          closed_entry = closed.find {|i| i.node == node }
-          entry = open_entry || closed_entry || Entry.new(node, current, nil)
+          open_entry = open.find { |i| i.node == node }
+          closed_entry = closed.find { |i| i.node == node }
+          entry = open_entry || closed_entry ||
+            Entry.new(node, current, nil)
 
-          goal_distance = heuristic_function.call node
-          start_distance = distance entry, root_entry, distance_function
-          entry.distance ||= start_distance
+          distance_from_start = distance(entry, distance_function)
+          entry.distance ||= distance_from_start
 
           # Greedy BFS:
 
@@ -94,15 +92,15 @@ module BFsearch
           if !(open_entry || closed_entry)
             open.push entry
           else
-            if start_distance < entry.distance
+            if distance_from_start < entry.distance
               entry.parent = current
-              entry.distance = start_distance
+              entry.distance = distance_from_start
               open.push entry unless open_entry
             end
           end
         end
 
-        open.sort {|a, b| a[:distance] <=> b[:distance] }
+        open.sort_by(&:distance)
       end
     end
   end
@@ -113,7 +111,7 @@ module BFsearch
   def self.construct_path(root_node, destination)
     nodes = [destination[:node]]
 
-    while destination[:node] != root_node do
+    while destination[:node] != root_node
       destination = destination[:parent]
       nodes.unshift destination[:node]
     end
@@ -124,13 +122,13 @@ module BFsearch
   ##
   # Retruns the accumulated distance between two nodes along the currently
   # recorded path
-  def self.distance(start, destination, distance_function)
+  def self.distance(start, distance_function)
     current = start
     distance = 0.0
 
-    while current != destination
-      distance += distance_function.call current[:node], current[:parent][:node]
-      current = current[:parent]
+    while current.parent
+      distance += distance_function.call current.node, current.parent.node
+      current = current.parent
     end
 
     distance
