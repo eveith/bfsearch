@@ -44,7 +44,7 @@ module BFsearch
   # +neighbors_function#call(current_node)+ and returns a list of adjacent
   # nodes.
   #
-  #   neighbors_function(node)  # => Array
+  #   neighbors_function.call(node)  # => Array
   #
   # BFS is an informed search algorithm, i.e., it uses an heuristic to select
   # the probably best next node at any given state. This heuristic is
